@@ -2,8 +2,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
-builder.Services.AddOpenApi();
-builder.Services.AddSingleton<IRoomAppService, RoomAppService>();
+
+// Registre as dependências na ordem correta
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IBroadCastMenssagenAsync, BroadCastMenssagenAsync>();
+builder.Services.AddScoped<IRoomAppService, RoomAppService>();
+builder.Services.AddScoped<IAcceptWebSocket, AcceptWebSocket>();
 
 var app = builder.Build();
 
@@ -17,4 +21,6 @@ app.UseHttpsRedirection();
 app.UseWebSockets();
 app.MapControllers();
 app.Run();
+
+
 

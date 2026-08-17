@@ -6,8 +6,9 @@ public class RoomController: IRoomController
 {
     private readonly IRoomAppService _RoomAppService;
     private readonly IHttpContextAccessor _HttpContextAccessor;
-    private readonly AcceptWebSocket _AcceptWebSocket;
-    public RoomController( IRoomAppService roomAppService,AcceptWebSocket acceptWebSocket, IHttpContextAccessor httpContextAccessor)
+    private readonly IAcceptWebSocket _AcceptWebSocket;
+    
+    public RoomController(IRoomAppService roomAppService, IAcceptWebSocket acceptWebSocket, IHttpContextAccessor httpContextAccessor)
     {
         _RoomAppService = roomAppService;
         _HttpContextAccessor = httpContextAccessor;
@@ -23,7 +24,7 @@ public class RoomController: IRoomController
             var httpContext = _HttpContextAccessor.HttpContext;
             var socket = await _AcceptWebSocket.AcceptWebSocketAsync(httpContext);
 
-            await _RoomAppService.JoinRoomAsync((int)salaId,nametag, socket, cancellationToken, timeZone);
+            await _RoomAppService.JoinRoomAsync(salaId,nametag, socket, cancellationToken, timeZone);
         }
         catch (Exception err)
         {
@@ -33,5 +34,19 @@ public class RoomController: IRoomController
         }
 
 
+    }
+    [HttpPost("/criated")]
+    public async Task<RoomDto> CreadtedRoom([FromHeader(Name = "X-Time-Zone")] string _timeZone )
+    {
+        try
+        {
+        return await _RoomAppService.CreatedRoomNotExist(_timeZone);
+            
+        }
+        catch (Exception err)
+        {
+            
+            throw new Exception("Erro: "+err);
+        }
     }
 }

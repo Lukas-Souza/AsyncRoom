@@ -3,39 +3,49 @@ using System.Net.WebSockets;
 using System.Text;
 using Microsoft.AspNetCore.Http; 
 using System;
+using System.Diagnostics.Eventing.Reader;
 public class RoomAppService: IRoomAppService
 {
-    
-    private static readonly ConcurrentDictionary<long, RoomEntitie> _room = new();
     private readonly ILogger<RoomAppService> _logger ;
-    public RoomAppService(ILogger<RoomAppService> logger)
+    private readonly IRoomRepository _roomRepository;
+    private readonly IBroadCastMenssagenAsync _broadCastMenssagenAsync;
+    public RoomAppService(ILogger<RoomAppService> logger, IRoomRepository roomRepository, IBroadCastMenssagenAsync broadCastMenssagenAsync)
     {
         _logger = logger;
+        _roomRepository = roomRepository;
+        _broadCastMenssagenAsync = broadCastMenssagenAsync;
     }
     public async Task JoinRoomAsync (long idRoom, string nameTag,WebSocket webSocket, CancellationToken cancellationToken, string timeZone)
     {
-
-
-        if (String.IsNullOrWhiteSpace(timeZone)) return; 
-        else if( String.IsNullOrWhiteSpace(nameTag) ) return;
-        else if( webSocket == null ) return;
-        else if (idRoom < 0 ) return;
+        if (String.IsNullOrWhiteSpace(timeZone)) throw new Exception("Erro: TimeZone nulla"); 
+        else if( String.IsNullOrWhiteSpace(nameTag) ) throw new Exception("Erro: nameTag nulla");
+        else if( webSocket == null ) throw new Exception("Erro: WebScoket nulla");
+        else if (idRoom < 0 ) throw new Exception("Erro: o Id da sala não pode ser nulla");
+        if (!await _roomRepository.IsExistRoom(idRoom)) throw new Exception("Erro: Sala não econtarada");
         else
         {
-
-        
-        var room = _room[idRoom];
+        var allUsersInRoom = await _roomRepository.GetAllParticipantInRoom(idRoom);
+        if(await _roomRepository.IsExistInRoom(allUsersInRoom, nameTag)) throw new Exception("Erro: Key duplicada");
+            var rooms = _roomRepository.GetRooms();
+            var roomById = rooms[idRoom];
+            if(!await _roomRepository.IsExistRoom(idRoom)) throw new Exception("Sala não encontrada.");
         var Participant = new ParticipantUserAsync(nameTag, timeZone, idRoom.ToString(), webSocket);
-        room.UserParticiantAsyn.Add(Participant); 
-
+        
+        if (roomById?.UserParticiantAsyn != null)
+        {
+            roomById.UserParticiantAsyn.Add(Participant);
+            roomById.DataAtualizacao = DateTime.Now;
+        }
         var buffer = new Byte[1024*4];
         try
         {
             var result = await webSocket.ReceiveAsync(buffer, cancellationToken);
             while (!result.CloseStatus.HasValue)
             {
+               _roomRepository.DeletRoomIfEmpty(idRoom, roomById);
                 var textMenssagen = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                await BroadCastAsync(idRoom, Participant.Id, textMenssagen, cancellationToken, room);
+
+                await _broadCastMenssagenAsync.SendAllMenssagenAsync(allUsersInRoom,Participant.Id, textMenssagen, cancellationToken);
                 result = await webSocket.ReceiveAsync(buffer, cancellationToken);
             }
         }            
@@ -48,30 +58,8 @@ public class RoomAppService: IRoomAppService
             throw;
         }
     }}
-    private async Task BroadCastAsync(long _salaId, Guid remente, string textMenssagen, CancellationToken cancellationToken, RoomEntitie _roomAsync)
+    public async Task<RoomDto> CreatedRoomNotExist(string timeZone)
     {
-     var bytes = Encoding.UTF8.GetBytes(textMenssagen);
-        foreach (var socket in _roomAsync.UserParticiantAsyn)
-        {
-
-            await socket.WebSocketAsync.SendAsync(bytes, WebSocketMessageType.Text, true,cancellationToken);
-        }
-
+        return await _roomRepository.AddAsync(timeZone);     
     }
-    private void RemoveInRoom(long _salaId, long userId)
-    {
-        if (_room.TryGetValue(_salaId, out var usuarios))
-        {
-            usuarios.UserParticiantAsyn = new ConcurrentBag<ParticipantUserAsync>(
-                usuarios.UserParticiantAsyn.Where(participant => participant != null));
-
-            if (usuarios.UserParticiantAsyn.IsEmpty)
-            {
-                _room.TryRemove(_salaId, out _);
-                _logger.LogInformation("Sala esta removida");
-            }
-
-            _logger.LogInformation("Usuário {UsuarioId} saiu da sala {SalaId}", userId, _salaId);
-        }
     }
-}

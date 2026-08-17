@@ -2,25 +2,35 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-public class RoomRepository
+public class RoomRepository: IRoomRepository
 {
     private static readonly ConcurrentDictionary<long, RoomEntitie> _room = new();
-    public Task<RoomEntitie> GetOrAddAsync(long roomId, string timeZone)
+    public async Task<RoomDto> AddAsync( string timeZone)
     {
         try
         {
             if (_room.Count >= 10) throw new Exception("Limite de criação de sala atingida");
 
-            else
-            {
-                
-        var connectionSyncRoom = _room.GetOrAdd(roomId, _=>  new RoomEntitie
+        else
+        {
+
+         long keyIdRomAync = Random.Shared.Next(00000, 99999);    
+
+        _room.TryAdd(keyIdRomAync, new RoomEntitie
         {
             TimeZone = timeZone,
             DataAtualizacao = DateTime.Now,
             UserParticiantAsyn = new ConcurrentBag<ParticipantUserAsync>()
         });
-        return Task.FromResult(connectionSyncRoom);
+        Console.WriteLine(_room.Count);
+
+        return new RoomDto
+        {
+            Id = keyIdRomAync,
+            DataAtualizacao = _room[keyIdRomAync].DataAtualizacao,
+            TimeZone = _room[keyIdRomAync].TimeZone,
+            UserParticiantAsyn = _room[keyIdRomAync].UserParticiantAsyn             
+        };
         }
         }
 
@@ -30,7 +40,7 @@ public class RoomRepository
             throw new Exception("Erro: "+ err);
         };
     }
-    public async Task<ConcurrentBag<ParticipantUserAsync>> GetAllParticipantInRoom(int idRoom_)
+    public async Task<ConcurrentBag<ParticipantUserAsync>> GetAllParticipantInRoom(long idRoom_)
     {
         try
         {
@@ -38,7 +48,7 @@ public class RoomRepository
             {
                 
             }
-            var allPartcipant = room.UserParticiantAsyn ?? new ConcurrentBag<ParticipantUserAsync>();
+            var allPartcipant = room?.UserParticiantAsyn ?? new ConcurrentBag<ParticipantUserAsync>();
             return await Task.FromResult(allPartcipant);
         }
         catch (System.Exception)
@@ -65,15 +75,17 @@ public class RoomRepository
             throw;
         }
     }
-    public void DeletRoomIfEmpty(int idRoom)
+    public void DeletRoomIfEmpty(long idRoom, RoomEntitie roomEntitie )
     {
         try
         {
+            TimeSpan diferenca = roomEntitie.DataAtualizacao - DateTime.Now;
+
             if (!_room.TryGetValue(idRoom,out var room ))
             {
                 return;                
             }
-            if(room.UserParticiantAsyn?.IsEmpty == true)
+            else if((room.UserParticiantAsyn?.Count == 0) && (diferenca.TotalMinutes > 5))
             {
                 _room.TryRemove(idRoom, out _);
                 return;
@@ -84,5 +96,23 @@ public class RoomRepository
             
             throw;
         }
+    }
+    public async Task<bool> IsExistInRoom(ConcurrentBag<ParticipantUserAsync> participantUserAsyncs, string name)
+
+{
+        return participantUserAsyncs.Any(x => string.Equals(x.NameTag,name, StringComparison.OrdinalIgnoreCase));  
+
+}
+         
+
+    public async Task<bool> IsExistRoom(long idRoom){
+       return _room.ContainsKey(idRoom);     
+
+    }   
+    public RoomEntitie GetRoomById(long idRoom_){
+        return _room[idRoom_];
+    } 
+    public ConcurrentDictionary<long, RoomEntitie> GetRooms(){
+        return _room;
     }
 }

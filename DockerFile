@@ -1,0 +1,22 @@
+# ---------- Etapa 1: Build ----------
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copia apenas o .csproj primeiro (aproveita cache de camadas)
+COPY src/SocketAsynMessagens.csproj ./src/
+RUN dotnet restore ./src/SocketAsynMessagens.csproj
+
+# Copia o resto do código e publica
+COPY src/. ./src/
+RUN dotnet publish ./src/SocketAsynMessagens.csproj -c Release -o /app/publish
+
+# ---------- Etapa 2: Runtime ----------
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+
+ENTRYPOINT ["dotnet", "SocketAsynMessagens.dll"]

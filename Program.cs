@@ -2,10 +2,8 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 var redisConnection = builder.Configuration.GetConnectionString("room-sync")
-    ?? builder.Configuration["REDIS_URL"]
-    ?? (builder.Environment.IsDevelopment() ? "localhost:6379,abortConnect=false" : null)
     ?? throw new InvalidOperationException(
-        "Configure ConnectionStrings__room-sync ou REDIS_URL no ambiente da aplicação.");
+        "A conexão ConnectionStrings:room-sync não foi configurada.");
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");

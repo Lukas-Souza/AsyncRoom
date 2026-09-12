@@ -9,11 +9,6 @@ services:
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
-      - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: socketasynmessagen-redis
-          property: connectionString
 
   - type: keyvalue
     name: socketasynmessagen-redis

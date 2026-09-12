@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: socketasynmessagen
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: socketasynmessagen-redis
+          property: connectionString
+
+  - type: keyvalue
+    name: socketasynmessagen-redis
+    plan: free
+    region: oregon
+    ipAllowList: []

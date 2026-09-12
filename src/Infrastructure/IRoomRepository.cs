@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 public interface IRoomRepository
 {
-    public  Task<bool> IsExistInRoom(ConcurrentBag<ParticipantUserAsync> participantUserAsyncs, string name);
+    public Task<bool> IsExistInRoom(ConcurrentBag<ParticipantUserAsync> participantUserAsyncs, string name);
     public Task<RoomDto> AddAsync(string timeZone);
     public Task<ConcurrentBag<ParticipantUserAsync>> GetAllParticipantInRoom(long idRoom_);
     public Task<Task> AddParticipantInRoomAsync(long idRoom, ParticipantUserAsync participantUserAsync);

@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[Controller]")]
-public class RoomController: IRoomController
+public class RoomController : IRoomController
 {
     private readonly IRoomAppService _RoomAppService;
     private readonly IHttpContextAccessor _HttpContextAccessor;
     private readonly IAcceptWebSocket _AcceptWebSocket;
-    
+
     public RoomController(IRoomAppService roomAppService, IAcceptWebSocket acceptWebSocket, IHttpContextAccessor httpContextAccessor)
     {
         _RoomAppService = roomAppService;

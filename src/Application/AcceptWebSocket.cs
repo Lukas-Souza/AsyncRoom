@@ -1,6 +1,6 @@
 using System.Net.WebSockets;
 
-public class AcceptWebSocket: IAcceptWebSocket
+public class AcceptWebSocket : IAcceptWebSocket
 {
     public async Task<WebSocket> AcceptWebSocketAsync(HttpContext _httpContext)
     {
@@ -11,12 +11,12 @@ public class AcceptWebSocket: IAcceptWebSocket
         }
         try
         {
-            return  await _httpContext.WebSockets.AcceptWebSocketAsync();
-             
+            return await _httpContext.WebSockets.AcceptWebSocketAsync();
+
         }
         catch (System.Exception)
         {
-            
+
             throw;
         }
     }

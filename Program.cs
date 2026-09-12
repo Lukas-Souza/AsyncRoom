@@ -21,7 +21,8 @@ builder.Services.AddScoped<IAcceptWebSocket, AcceptWebSocket>();
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     ConnectionMultiplexer.Connect(redisConnection));
 // Add Redis
-builder.Services.AddStackExchangeRedisCache(options => {
+builder.Services.AddStackExchangeRedisCache(options =>
+{
     options.Configuration = redisConnection;
 });
 var app = builder.Build();

@@ -1,0 +1,1 @@
+dotnet add Microsoft.Extensions.Caching.StackExchangeRedis

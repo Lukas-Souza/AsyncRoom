@@ -1,4 +1,11 @@
+using StackExchange.Redis;
+
 var builder = WebApplication.CreateBuilder(args);
+var redisConnection = builder.Configuration.GetConnectionString("room-sync")
+    ?? throw new InvalidOperationException("A configuração ConnectionStrings:room-sync não foi definida.");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
@@ -8,7 +15,12 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IBroadCastMenssagenAsync, BroadCastMenssagenAsync>();
 builder.Services.AddScoped<IRoomAppService, RoomAppService>();
 builder.Services.AddScoped<IAcceptWebSocket, AcceptWebSocket>();
-
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(redisConnection));
+// Add Redis
+builder.Services.AddStackExchangeRedisCache(options => {
+    options.Configuration = redisConnection;
+});
 var app = builder.Build();
 
 
@@ -17,7 +29,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-app.UseHttpsRedirection();
 app.UseWebSockets();
 app.MapControllers();
 app.Run();

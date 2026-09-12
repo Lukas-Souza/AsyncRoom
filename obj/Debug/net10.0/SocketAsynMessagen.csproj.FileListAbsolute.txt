@@ -31,3 +31,7 @@
 /home/lucas-lima/Dev/SocketAsynMessagen/obj/Debug/net10.0/SocketAsynMessagen.pdb
 /home/lucas-lima/Dev/SocketAsynMessagen/obj/Debug/net10.0/SocketAsynMessagen.genruntimeconfig.cache
 /home/lucas-lima/Dev/SocketAsynMessagen/obj/Debug/net10.0/ref/SocketAsynMessagen.dll
+/home/lucas-lima/Dev/SocketAsynMessagen/bin/Debug/net10.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll
+/home/lucas-lima/Dev/SocketAsynMessagen/bin/Debug/net10.0/Pipelines.Sockets.Unofficial.dll
+/home/lucas-lima/Dev/SocketAsynMessagen/bin/Debug/net10.0/StackExchange.Redis.dll
+/home/lucas-lima/Dev/SocketAsynMessagen/obj/Debug/net10.0/SocketAsynMessagen.sourcelink.json

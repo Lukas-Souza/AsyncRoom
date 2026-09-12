@@ -9,6 +9,7 @@ public class RoomAppService: IRoomAppService
     private readonly ILogger<RoomAppService> _logger ;
     private readonly IRoomRepository _roomRepository;
     private readonly IBroadCastMenssagenAsync _broadCastMenssagenAsync;
+    private static readonly TimeSpan TimeInterval = TimeSpan.FromSeconds(20); 
     public RoomAppService(ILogger<RoomAppService> logger, IRoomRepository roomRepository, IBroadCastMenssagenAsync broadCastMenssagenAsync)
     {
         _logger = logger;
@@ -17,6 +18,7 @@ public class RoomAppService: IRoomAppService
     }
     public async Task JoinRoomAsync (long idRoom, string nameTag,WebSocket webSocket, CancellationToken cancellationToken, string timeZone)
     {
+        
         if (String.IsNullOrWhiteSpace(timeZone)) throw new Exception("Erro: TimeZone nulla"); 
         else if( String.IsNullOrWhiteSpace(nameTag) ) throw new Exception("Erro: nameTag nulla");
         else if( webSocket == null ) throw new Exception("Erro: WebScoket nulla");
@@ -30,6 +32,7 @@ public class RoomAppService: IRoomAppService
             var roomById = rooms[idRoom];
             if(!await _roomRepository.IsExistRoom(idRoom)) throw new Exception("Sala não encontrada.");
         var Participant = new ParticipantUserAsync(nameTag, timeZone, idRoom.ToString(), webSocket);
+        _roomRepository.AddParticipantInRoomAsync(idRoom, Participant);
         
         if (roomById?.UserParticiantAsyn != null)
         {
@@ -37,6 +40,8 @@ public class RoomAppService: IRoomAppService
             roomById.DataAtualizacao = DateTime.Now;
         }
         var buffer = new Byte[1024*4];
+        using var __Obje = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var heartbeatTask = StartHeartbeatAsync(webSocket, __Obje.Token);
         try
         {
             var result = await webSocket.ReceiveAsync(buffer, cancellationToken);
@@ -58,6 +63,23 @@ public class RoomAppService: IRoomAppService
             throw;
         }
     }}
+    private async Task StartHeartbeatAsync(WebSocket webSocket, CancellationToken token)
+    {
+            try
+    {
+        while (!token.IsCancellationRequested && webSocket.State == WebSocketState.Open)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(20), token);
+            if (webSocket.State == WebSocketState.Open)
+            {
+                var pingBytes = Encoding.UTF8.GetBytes("{\"type\":\"ping\"}");
+                await webSocket.SendAsync(pingBytes, WebSocketMessageType.Text, true, token);
+            }
+        }
+    }
+    catch (OperationCanceledException) { }
+    catch (WebSocketException) { }
+    }
     public async Task<RoomDto> CreatedRoomNotExist(string timeZone)
     {
         return await _roomRepository.AddAsync(timeZone);     

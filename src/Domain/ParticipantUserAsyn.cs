@@ -7,6 +7,7 @@ public class ParticipantUserAsync
     public String? TimeZone {get; private set;}
     public String? Section {get; private set;}
     public WebSocket? WebSocketAsync{ get; private set;}
+    public ParticipantUserAsync() { } 
     public DateTime DataCriacaoUser {get; private set;}
     
     public ParticipantUserAsync( string _NameTag, String _TimeZone, String _Section, WebSocket _WebSocket)

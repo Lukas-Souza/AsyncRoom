@@ -1,17 +1,20 @@
 {
   "version": 2,
-  "dgSpecHash": "wl3KsYw79vI=",
+  "dgSpecHash": "akDf+3bhWok=",
   "success": true,
   "projectFilePath": "/home/lucas-lima/Dev/SocketAsynMessagen/SocketAsynMessagen.csproj",
   "expectedPackageFiles": [
     "/home/lucas-lima/.nuget/packages/microsoft.aspnetcore.openapi/10.0.1/microsoft.aspnetcore.openapi.10.0.1.nupkg.sha512",
-    "/home/lucas-lima/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+    "/home/lucas-lima/.nuget/packages/microsoft.extensions.caching.stackexchangeredis/10.0.11/microsoft.extensions.caching.stackexchangeredis.10.0.11.nupkg.sha512",
+    "/home/lucas-lima/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512",
+    "/home/lucas-lima/.nuget/packages/pipelines.sockets.unofficial/2.2.8/pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+    "/home/lucas-lima/.nuget/packages/stackexchange.redis/2.7.27/stackexchange.redis.2.7.27.nupkg.sha512"
   ],
   "logs": [
     {
       "code": "NU1903",
       "level": "Warning",
-      "message": "O pacote 'Microsoft.OpenApi' 2.0.0 tem uma alta vulnerabilidade de gravidade conhecida, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
+      "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
       "projectPath": "/home/lucas-lima/Dev/SocketAsynMessagen/SocketAsynMessagen.csproj",
       "warningLevel": 1,
       "filePath": "/home/lucas-lima/Dev/SocketAsynMessagen/SocketAsynMessagen.csproj",

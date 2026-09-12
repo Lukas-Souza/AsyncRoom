@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SocketAsynMessagen")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a545f77ace35feb7c252bec7f10df6717e14750f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21cb63b458d718357a89d71eff180d7e61295d61")]
 [assembly: System.Reflection.AssemblyProductAttribute("SocketAsynMessagen")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SocketAsynMessagen")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
